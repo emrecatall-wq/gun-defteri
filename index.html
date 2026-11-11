@@ -31,7 +31,7 @@ input,textarea,select{font:inherit;color:var(--txt);background:var(--panel);bord
 #top button{height:2.7em;padding:0 .45em;font-size:1.05em;color:var(--toptxt);border-radius:10px}
 #top button:active{background:#ffffff22}
 #dateBtn{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15;overflow:hidden}
-#dateBtn .brand{font-size:.6em;letter-spacing:.14em;opacity:.85;font-weight:700;white-space:nowrap}
+#dateBtn .brand{font-size:.58em;letter-spacing:.04em;opacity:.85;font-weight:700;white-space:nowrap}
 #dateBtn .dbig{font-size:1.22em;font-weight:800;white-space:nowrap;letter-spacing:.01em}
 #dateBtn .tb{background:var(--acc);color:#fff;border-radius:6px;padding:0 .35em;margin-left:.3em;letter-spacing:.05em}
 #dateBtn small{font-weight:400;opacity:.8}
@@ -164,7 +164,7 @@ th{background:var(--bg);font-size:.85em}
 #files .thumb .del{position:absolute;top:2px;right:2px;width:1.6em;height:1.6em;border-radius:50%;background:#e53935;color:#fff;font-size:1.1em;font-weight:900;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px #0008;z-index:2;border:2px solid #fff}
 #files.big{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(8.5em,1fr));gap:.45em;flex-basis:100%;padding:.2em 0}
 #files.big .thumb{width:100%;height:auto;aspect-ratio:1;font-size:.85em;border-radius:10px}
-#files.big .thumb span{display:block}
+#files.big .thumb span{display:none}
 #files.big .thumb .del{width:2em;height:2em;font-size:1.05em;top:5px;right:5px}
 #files .thumb.vid b{position:absolute;color:#fff;text-shadow:0 0 6px #000}
 #files .thumb.away{background:var(--bg);color:var(--sub)}
@@ -197,7 +197,9 @@ th{background:var(--bg);font-size:.85em}
 #qR small{font-size:.55em;font-weight:700}
 #qOk{height:2.5em;padding:0 .9em;font-size:1.1em}
 .qrow{display:flex;gap:.3em;align-items:center}.qi{font-size:1.2em}
-#qA{width:6.2em;font-weight:700}#qD{flex:1;min-width:0}#qOk{padding:.4em .7em}
+#qA{flex:1;min-width:0;font-weight:800;font-size:1.2em!important;text-align:center}
+#qD{display:block;width:100%;margin-top:.4em;min-height:3.4em;resize:vertical;line-height:1.4;border:2px solid var(--line);border-radius:8px;font-size:1.02em;padding:.45em .5em;background:var(--panel);font-family:inherit}
+#qD:focus{outline:none;border-color:var(--acc)}#qOk{padding:.4em .7em}
 .chips{display:flex;gap:.3em;flex-wrap:wrap;margin-top:.35em;align-items:stretch}
 .chip{display:flex;flex-direction:column;align-items:center;min-width:2.3em;border:1px solid var(--line);border-radius:7px;padding:.1em .25em .15em;font-size:.82em;font-weight:800;cursor:pointer;user-select:none}
 .chip input{width:1.3em;height:1.3em;margin:.1em 0 0;accent-color:var(--acc)}
@@ -265,7 +267,8 @@ th{background:var(--bg);font-size:.85em}
     <div class="qhead"><span>💰 PARA GİRİŞİ</span><span style="display:flex;gap:.4em;align-items:center"><span id="qTot"></span><button id="qTog" title="Kutucukları göster / gizle">▾</button></span></div>
     <div class="qsec qwhere"><div class="qlbl">Nereye? <small>(birden fazla seçebilirsin)</small></div><div class="chips" id="qC"></div></div>
     <div class="qsec qamt"><div class="qlbl">Tutar ve açıklama <small>(harcama: −250)</small><span id="qSel"></span></div>
-     <div class="qrow"><button id="qR" title="Girilen hareketler">▾<small id="qCnt"></small></button><input id="qA" type="text" inputmode="decimal" placeholder="Tutar" autocomplete="off"><input id="qD" placeholder="Açıklama (market, mazot...)" autocomplete="off"><button id="qOk" class="btn">✔</button></div></div>
+     <div class="qrow"><button id="qR" title="Girilen hareketler">▾<small id="qCnt"></small></button><input id="qA" type="text" inputmode="decimal" placeholder="Tutar  (−250 / 5000)" autocomplete="off"><button id="qOk" class="btn">✔</button></div>
+     <textarea id="qD" rows="2" placeholder="Açıklama — 2-3 cümle yazabilirsin (market, mazot, Ali Bey banyo işi...)" autocomplete="off"></textarea></div>
   </div>
 
   <div class="hdr nhdr"><span>📌 Notlar / Hatırlatmalar</span><button id="addNoteBtn">+ Not ekle</button></div>
@@ -590,8 +593,9 @@ $('#tClear').onclick=()=>{const t=$('#dayText');if(!t.value)return;if(confirm('B
 let aRec=null,aStream=null,aChunks=[],aStart=0,aTimer=null,aLive=null,aLiveText='',aPlay=null;
 const fmtT=s=>Math.floor(s/60)+':'+pad(Math.floor(s%60));
 const aMime=()=>['audio/mp4;codecs=mp4a.40.2','audio/mp4','audio/webm;codecs=opus','audio/webm'].find(t=>window.MediaRecorder&&MediaRecorder.isTypeSupported(t))||'';
+let raTok=0;
 async function renderAudio(){
- const r=await get('audio',cur),box=$('#audioChip');
+ const my=++raTok,r=await get('audio',cur),box=$('#audioChip');if(my!==raTok)return;
  if(!r||!r.segs.length){box.innerHTML='';return}
  const tot=r.segs.reduce((a,x)=>a+(x.dur||0),0);
  box.innerHTML=`<div class="achip ${aPlay?'play':''}" id="aChip">🎙 Ses notu · ${fmtT(tot)}${r.segs.length>1?' · '+r.segs.length+' parça':''}${aPlay?' ⏸':''}</div>`;
@@ -744,9 +748,9 @@ $('#qOk').onclick=async()=>{
   if(isNaN(a)||!a){$('#qA').focus();toast('Tutar yaz');return}
   await put('money',{id:uid(),date:cur,amount:a,desc:d,tags,created:Date.now()});
   toast(sgn(a)+' → '+tags.map(tCode).join(' + '))}
- $('#qA').value='';$('#qD').value='';drawQuick();renderMoney();$('#qA').blur();$('#qD').blur();$('#qSel').textContent='';$('#quick')._manual=false;$('#quick').classList.add('shut');
+ $('#qA').value='';$('#qD').value='';$('#qD').style.height='';drawQuick();renderMoney();$('#qA').blur();$('#qD').blur();$('#qSel').textContent='';$('#quick')._manual=false;$('#quick').classList.add('shut');
 };
-$('#qD').addEventListener('keydown',e=>{if(e.key==='Enter')$('#qOk').click()});
+$('#qD').addEventListener('input',()=>{const d=$('#qD');d.style.height='auto';d.style.height=Math.min(d.scrollHeight+4,160)+'px'});
 // ▾ Son girilenler: kategoriyi sonradan düzelt
 $('#qR').onclick=()=>movesPanel('gun');
 // kutucuklar: tutar/açıklama yazarken açılır, boş kalınca şıkça kapanır
@@ -978,12 +982,15 @@ function renderRoutines(){
   box.appendChild(row)});
 }
 /* Notlar (ileri tarihli) */
+let rnTok=0;
 async function renderNotes(){
- const box=$('#notes');box.innerHTML='';
- let list=await byDate('notes',cur);
- if(cur===todayKey()){ // gecikmişler bugüne taşınır
-  const late=(await all('notes')).filter(n=>!n.done&&n.date<cur).sort((a,b)=>a.date<b.date?-1:1);
+ const my=++rnTok,day=cur;
+ let list=await byDate('notes',day);
+ if(day===todayKey()){ // gecikmişler bugüne taşınır
+  const late=(await all('notes')).filter(n=>!n.done&&n.date<day).sort((a,b)=>a.date<b.date?-1:1);
   list=late.concat(list)}
+ if(my!==rnTok||day!==cur)return;
+ const box=$('#notes');box.innerHTML='';
  if(!list.length){box.innerHTML='<div class="row"><div class="empty">Bu güne not yok.</div></div>';return}
  list.forEach(n=>{
   const late=n.date<cur&&!n.done;
@@ -1014,9 +1021,12 @@ function noteForm(n){
 /* Evraklar */
 const urls=new Map();
 const furl=f=>{if(!f.blob)return'';if(!urls.has(f.id))urls.set(f.id,URL.createObjectURL(f.blob));return urls.get(f.id)};
+let rfTok=0;
 async function renderFiles(){
+ const my=++rfTok,day=cur;
+ const list=(await byDate('files',day)).sort((a,b)=>a.created-b.created);
+ if(my!==rfTok||day!==cur)return; // aynı anda iki çizim olursa eskisini at (çift resim hatası)
  const box=$('#files');box.innerHTML='';box.classList.toggle('big',!!S.mediaBig);
- const list=(await byDate('files',cur)).sort((a,b)=>a.created-b.created);
  const h=$('#mHandle');h.classList.toggle('on',list.length>0);h.querySelector('span').textContent=S.mediaBig?'︽ küçültmek için yukarı it':'︾ büyütmek için aşağı çek ('+list.length+')';
  if(!list.length)return;
  list.forEach(f=>{const t=document.createElement('div');t.className='thumb';
@@ -1218,7 +1228,11 @@ async function search(){
 /* ========== Kamera — telefon kamerası gibi: flaş açık/kapalı, çekim tuşu, video, zoom, ön/arka ========== */
 let stream=null,vtrack=null,torch=S.torch!==false,facing='environment',recorder=null,recRAF=null,chunks=[],stampT=null,lastFile=null,recStart=0;
 const V=$('#camV'),CV=$('#cv');
-$('#takeBtn').onclick=openCam;
+$('#takeBtn').onclick=()=>{if(AND&&AND.openCamera)AND.openCamera(torch,GUNLER.join(','));else openCam()};
+// APK'daki gerçek kamera (flaş Android'in kendi kamera sistemiyle) — çekilenler buraya gelir
+window.onNativeShots=async(list,tor)=>{torch=!!tor;S.torch=torch;saveS();let n=0;
+ for(const f of list||[]){try{const b=await (await fetch('/cam/'+encodeURIComponent(f.file))).blob();await addFile(new Blob([b],{type:f.type}),f.name,cur);n++}catch(e){}}
+ if(AND&&AND.camClear)AND.camClear();renderFiles();if(n)toast(n+' çekim eklendi')};
 function dateStamp(){const d=new Date();return pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear()+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds())}
 async function openCam(){
  $('#cam').classList.add('on');paintTorch();await startStream();
